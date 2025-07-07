@@ -38,7 +38,6 @@
             <!-- Form Section -->
             <div class="bg-white p-6 lg:p-8 rounded-2xl shadow-lg">
                 <form id="quote-form" onsubmit="event.preventDefault();">
-                    <!-- Client & Property Details -->
                     <div class="form-section">
                         <h2 class="text-xl font-bold mb-4 text-gray-700">Client & Property Details</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -49,22 +48,7 @@
                             <div>
                                 <label for="property-location" class="block text-sm font-medium text-gray-700">Property State</label>
                                 <select id="property-location" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option selected>Selangor</option>
-                                    <option>Johor</option>
-                                    <option>Kuala Lumpur</option>
-                                    <option>Kedah</option>
-                                    <option>Kelantan</option>
-                                    <option>Labuan</option>
-                                    <option>Melaka</option>
-                                    <option>Negeri Sembilan</option>
-                                    <option>Pahang</option>
-                                    <option>Penang</option>
-                                    <option>Perak</option>
-                                    <option>Perlis</option>
-                                    <option>Putrajaya</option>
-                                    <option>Sabah</option>
-                                    <option>Sarawak</option>
-                                    <option>Terengganu</option>
+                                    <option selected>Selangor</option><option>Johor</option><option>Kuala Lumpur</option><option>Kedah</option><option>Kelantan</option><option>Labuan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Penang</option><option>Perak</option><option>Perlis</option><option>Putrajaya</option><option>Sabah</option><option>Sarawak</option><option>Terengganu</option>
                                 </select>
                             </div>
                              <div class="md:col-span-2">
@@ -132,6 +116,9 @@
 
     <script>
         window.addEventListener('load', function () {
+            // IMPORTANT: Replace this with your actual Google Apps Script Web App URL.
+            const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
             const TAX_RATE = 0.08;
             const ALL_SERVICES = [
                 { id: 'spa_legal_fee', description: 'Sale & Purchase Agreement Legal Fees', type: 'professional', auto: true, calc: 'calcSpaLegalFee', taxable: true, default_checked: true },
@@ -364,20 +351,26 @@
                     grandTotal: data.grandTotal
                 };
 
-                google.script.run
-                    .withSuccessHandler(response => {
-                        statusMessage.textContent = response;
-                        statusMessage.style.color = 'green';
-                        mainButton.disabled = false;
-                        setTimeout(() => { statusMessage.style.opacity = 0; }, 4000);
-                    })
-                    .withFailureHandler(error => {
-                        statusMessage.textContent = 'Error: ' + error.message;
-                        statusMessage.style.color = 'red';
-                        mainButton.disabled = false;
-                        setTimeout(() => { statusMessage.style.opacity = 0; }, 4000);
-                    })
-                    .saveQuoteData(submissionData);
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Important for this type of request to Apps Script
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    redirect: 'follow',
+                    body: JSON.stringify(submissionData)
+                })
+                .then(() => {
+                    statusMessage.textContent = "Data sent successfully! Please check your Google Sheet.";
+                    statusMessage.style.color = 'green';
+                })
+                .catch(error => {
+                    statusMessage.textContent = 'Error sending data: ' + error.message;
+                    statusMessage.style.color = 'red';
+                })
+                .finally(() => {
+                    mainButton.disabled = false;
+                    setTimeout(() => { statusMessage.style.opacity = 0; }, 5000);
+                });
             }
 
             // --- INITIALIZATION ---
