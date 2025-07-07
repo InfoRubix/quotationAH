@@ -17,7 +17,7 @@
         .preview-header { text-align: center; margin-bottom: 1.5rem; }
         .preview-header h1 { font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem; }
         .preview-header p { font-size: 0.875rem; color: #4b5563; line-height: 1.4; }
-        .preview-details-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; margin-bottom: 1.5rem; }
+        .preview-details-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; margin-bottom: 1.5rem; align-items: center; }
         .preview-details-grid dt { font-weight: 600; color: #374151; }
         .preview-table th, .preview-table td { padding: 0.75rem 0.5rem; text-align: left; font-size: 0.875rem; word-wrap: break-word; }
         .preview-table th { background-color: #f3f4f6; }
@@ -45,7 +45,11 @@
                                 <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
                                 <input type="text" id="client-name" placeholder="e.g., John Doe" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
-                            <div>
+                             <div>
+                                <label for="matter-description" class="block text-sm font-medium text-gray-700">Matter</label>
+                                <input type="text" id="matter-description" value="Conveyancing (General)" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="md:col-span-2">
                                 <label for="property-location" class="block text-sm font-medium text-gray-700">Property State</label>
                                 <select id="property-location" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <option selected>Selangor</option><option>Johor</option><option>Kuala Lumpur</option><option>Kedah</option><option>Kelantan</option><option>Labuan</option><option>Melaka</option><option>Negeri Sembilan</option><option>Pahang</option><option>Penang</option><option>Perak</option><option>Perlis</option><option>Putrajaya</option><option>Sabah</option><option>Sarawak</option><option>Terengganu</option>
@@ -90,11 +94,11 @@
                 <h2 class="text-center font-bold text-2xl mb-4 text-gray-800" style="letter-spacing: 2px;">QUOTATION</h2>
                 <div class="preview-details-grid">
                     <dt>To:</dt><dd id="preview-client-name">N/A</dd>
-                    <dt>Matter:</dt><dd>Conveyancing (General)</dd>
+                    <dt>Matter:</dt><dd id="preview-matter">Conveyancing (General)</dd>
                     <dt>Property:</dt><dd id="preview-property-location">N/A</dd>
                     <dt>Purchase Price:</dt><dd id="preview-purchase-price">RM 0.00</dd>
                     <dt>Loan Amount:</dt><dd id="preview-loan-amount">RM 0.00</dd>
-                    <dt>Quotation No.:</dt><dd id="preview-quote-no">Q-XXXXX</dd>
+                    <dt>Quotation No.:</dt><dd><input type="text" id="preview-quote-no" class="w-full rounded-md border-gray-300 shadow-sm text-sm p-1"></dd>
                     <dt>Quotation Date:</dt><dd id="preview-quote-date">DD/MM/YYYY</dd>
                     <dt>Tax Reg. No.:</dt><dd>W24-1809-32100013</dd>
                 </div>
@@ -119,15 +123,14 @@
 
     <script>
         window.addEventListener('load', function () {
-            // IMPORTANT: Replace this with your actual Google Apps Script Web App URL.
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzef56sWVIHhl-gazM_BDK7mkIDrpmy2zB9assvTAZ1RjxN3wIKuNfxFuILO_u4y422cg/exec";
-
             const TAX_RATE = 0.08;
             const ALL_SERVICES = [
                 { id: 'spa_legal_fee', description: 'Sale & Purchase Agreement Legal Fees', type: 'professional', auto: true, calc: 'calcSpaLegalFee', taxable: true, default_checked: true },
                 { id: 'loan_legal_fee', description: 'Loan Agreement Legal Fees', type: 'professional', auto: true, calc: 'calcLoanLegalFee', taxable: true, default_checked: true },
                 { id: 'mot_stamp_duty', description: 'Stamp Duty on Memorandum of Transfer (MOT/14A)', type: 'disbursement', auto: true, calc: 'calcMotStampDuty', taxable: false, default_checked: true },
                 { id: 'loan_stamp_duty', description: 'Stamp Duty on Loan Agreement', type: 'disbursement', auto: true, calc: 'calcLoanStampDuty', taxable: false, default_checked: true },
+                { id: 'manual_prof_fees', description: 'Professional Fees (Manual)', type: 'professional', price: 1000, taxable: true, auto: false, default_checked: false },
                 { id: 'ckht2a', description: 'Filing CKHT 2A', type: 'professional', price: 400, taxable: true },
                 { id: 'ckht1', description: 'Filing CKHT 1', type: 'professional', price: 300, taxable: true },
                 { id: 'ckht3', description: 'Filing CKHT 3', type: 'professional', price: 200, taxable: true },
@@ -208,6 +211,7 @@
 
                 return {
                     clientName: document.getElementById('client-name').value || 'N/A',
+                    matter: document.getElementById('matter-description').value || 'Conveyancing (General)',
                     propertyValue,
                     loanAmount,
                     propertyLocation: document.getElementById('property-location').value,
@@ -221,12 +225,13 @@
             function updateQuotePreview() {
                 const data = getQuoteData();
                 document.getElementById('preview-client-name').textContent = data.clientName;
+                document.getElementById('preview-matter').textContent = data.matter;
                 document.getElementById('preview-property-location').textContent = data.propertyLocation;
                 document.getElementById('preview-purchase-price').textContent = `RM ${formatCurrency(data.propertyValue)}`;
                 document.getElementById('preview-loan-amount').textContent = `RM ${formatCurrency(data.loanAmount)}`;
                 const date = new Date();
                 document.getElementById('preview-quote-date').textContent = date.toLocaleDateString('en-GB');
-                document.getElementById('preview-quote-no').textContent = `Q${date.getTime().toString().slice(-5)}`;
+                document.getElementById('preview-quote-no').value = `Q${date.getTime().toString().slice(-5)}`;
                 const tableBody = document.getElementById('preview-table-body');
                 tableBody.innerHTML = '';
 
@@ -263,11 +268,9 @@
                 const jsPDF = window.jspdf.jsPDF;
                 const doc = new jsPDF();
                 const data = getQuoteData();
-                const date = new Date();
-                const quoteNo = `Q${date.getTime().toString().slice(-5)}`;
-                const quoteDate = date.toLocaleDateString('en-GB');
+                const quoteNo = document.getElementById('preview-quote-no').value;
+                const quoteDate = document.getElementById('preview-quote-date').textContent;
                 
-                // --- PDF Generation ---
                 doc.setFontSize(16).setFont('helvetica', 'bold').text('ASIAH & HISAM', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
                 doc.setFontSize(9).setFont('helvetica', 'normal');
                 doc.text('Advocates & Solicitors. Peguamcara & Peguambela.', doc.internal.pageSize.getWidth() / 2, 26, { align: 'center' });
@@ -278,7 +281,7 @@
                 doc.setFontSize(10);
                 const details = [
                     ['To:', data.clientName, 'Quotation No.:', quoteNo],
-                    ['Matter:', 'Conveyancing (General)', 'Quotation Date:', quoteDate],
+                    ['Matter:', data.matter, 'Quotation Date:', quoteDate],
                     ['Property:', data.propertyLocation, 'Tax Reg. No.:', 'W24-1809-32100013'],
                     ['Purchase Price:', `RM ${formatCurrency(data.propertyValue)}`],
                     ['Loan Amount:', `RM ${formatCurrency(data.loanAmount)}`],
@@ -318,7 +321,7 @@
                     { content: formatCurrency(data.grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
                 ]);
                 
-                doc.autoTable({
+                window.jspdf.autoTable(doc, {
                     head: [['Description', 'Tax (%)', 'Charges', 'Tax', 'Total (RM)']],
                     body: tableData,
                     startY: startY + 30,
@@ -334,7 +337,6 @@
                 doc.setFont('helvetica', 'normal').text('The issued quotation not to be treated as our final invoice and it is subjected to your confirmation prior to rendering the above legal services to you.', 14, finalY + 14, { maxWidth: 180 });
                 doc.save(`Quotation-${data.clientName.replace(/\s/g, '_')}-${quoteNo}.pdf`);
                 
-                // --- Google Sheet Saving ---
                 const mainButton = document.getElementById('main-action-button');
                 const statusMessage = document.getElementById('status-message');
                 mainButton.disabled = true;
@@ -346,6 +348,7 @@
                     quoteNo: quoteNo,
                     date: quoteDate,
                     clientName: data.clientName,
+                    matter: data.matter,
                     propertyLocation: data.propertyLocation,
                     propertyValue: data.propertyValue,
                     loanAmount: data.loanAmount,
@@ -378,10 +381,14 @@
 
             function resetForm() {
                 document.getElementById('quote-form').reset();
+                const checkboxes = document.querySelectorAll('.service-checkbox');
+                checkboxes.forEach(checkbox => {
+                    const service = ALL_SERVICES.find(s => s.id === checkbox.id);
+                    checkbox.checked = service.default_checked || false;
+                });
                 updateQuotePreview();
             }
 
-            // --- INITIALIZATION ---
             ALL_SERVICES.filter(s => !s.auto).forEach(service => {
                 const isChecked = service.default_checked ? 'checked' : '';
                 servicesList.innerHTML += `
