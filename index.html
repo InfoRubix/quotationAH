@@ -117,7 +117,7 @@
     <script>
         window.addEventListener('load', function () {
             // IMPORTANT: Replace this with your actual Google Apps Script Web App URL.
-            const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzef56sWVIHhl-gazM_BDK7mkIDrpmy2zB9assvTAZ1RjxN3wIKuNfxFuILO_u4y422cg/exec";
 
             const TAX_RATE = 0.08;
             const ALL_SERVICES = [
@@ -315,7 +315,7 @@
                     { content: formatCurrency(data.grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
                 ]);
                 
-                doc.autoTable({
+                window.jspdf.autoTable(doc, {
                     head: [['Description', 'Tax (%)', 'Charges', 'Tax', 'Total (RM)']],
                     body: tableData,
                     startY: startY + 30,
@@ -353,10 +353,10 @@
 
                 fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Important for this type of request to Apps Script
+                    mode: 'no-cors', // This is often required for simple Apps Script POST requests
                     cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
-                    redirect: 'follow',
+                    redirect: 'follow', // Important for Apps Script redirects
                     body: JSON.stringify(submissionData)
                 })
                 .then(() => {
