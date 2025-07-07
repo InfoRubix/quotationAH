@@ -67,9 +67,12 @@
                         <div id="services-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
                     </div>
 
-                    <div class="mt-6">
+                    <div class="mt-6 space-y-3">
                         <button type="button" id="main-action-button" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                             Generate PDF & Save to Sheet
+                        </button>
+                        <button type="button" id="new-quote-button" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-200">
+                            New Quotation
                         </button>
                     </div>
                     <div id="status-message" class="mt-4 text-center text-sm font-medium text-gray-600 opacity-0"></div>
@@ -257,7 +260,7 @@
             }
 
             function mainAction() {
-                const { jsPDF } = window.jspdf;
+                const jsPDF = window.jspdf.jsPDF;
                 const doc = new jsPDF();
                 const data = getQuoteData();
                 const date = new Date();
@@ -373,6 +376,11 @@
                 });
             }
 
+            function resetForm() {
+                document.getElementById('quote-form').reset();
+                updateQuotePreview();
+            }
+
             // --- INITIALIZATION ---
             ALL_SERVICES.filter(s => !s.auto).forEach(service => {
                 const isChecked = service.default_checked ? 'checked' : '';
@@ -388,6 +396,7 @@
             updateQuotePreview();
             form.addEventListener('input', updateQuotePreview);
             document.getElementById('main-action-button').addEventListener('click', mainAction);
+            document.getElementById('new-quote-button').addEventListener('click', resetForm);
         });
     </script>
 </body>
