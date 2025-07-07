@@ -123,7 +123,9 @@
 
     <script>
         window.addEventListener('load', function () {
+            // IMPORTANT: Replace this with your actual Google Apps Script Web App URL.
             const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzef56sWVIHhl-gazM_BDK7mkIDrpmy2zB9assvTAZ1RjxN3wIKuNfxFuILO_u4y422cg/exec";
+
             const TAX_RATE = 0.08;
             const ALL_SERVICES = [
                 { id: 'spa_legal_fee', description: 'Sale & Purchase Agreement Legal Fees', type: 'professional', auto: true, calc: 'calcSpaLegalFee', taxable: true, default_checked: true },
@@ -265,7 +267,7 @@
             }
 
             function mainAction() {
-                const jsPDF = window.jspdf.jsPDF;
+                const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const data = getQuoteData();
                 const quoteNo = document.getElementById('preview-quote-no').value;
@@ -321,7 +323,7 @@
                     { content: formatCurrency(data.grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
                 ]);
                 
-                window.jspdf.autoTable(doc, {
+                doc.autoTable({
                     head: [['Description', 'Tax (%)', 'Charges', 'Tax', 'Total (RM)']],
                     body: tableData,
                     startY: startY + 30,
