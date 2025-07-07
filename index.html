@@ -257,7 +257,7 @@
             }
 
             function mainAction() {
-                const jsPDF = window.jspdf.jsPDF;
+                const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 const data = getQuoteData();
                 const date = new Date();
@@ -315,7 +315,7 @@
                     { content: formatCurrency(data.grandTotal), styles: { halign: 'right', fontStyle: 'bold' } }
                 ]);
                 
-                window.jspdf.autoTable(doc, {
+                doc.autoTable({
                     head: [['Description', 'Tax (%)', 'Charges', 'Tax', 'Total (RM)']],
                     body: tableData,
                     startY: startY + 30,
@@ -353,10 +353,10 @@
 
                 fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // This is often required for simple Apps Script POST requests
+                    mode: 'no-cors', 
                     cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
-                    redirect: 'follow', // Important for Apps Script redirects
+                    redirect: 'follow', 
                     body: JSON.stringify(submissionData)
                 })
                 .then(() => {
